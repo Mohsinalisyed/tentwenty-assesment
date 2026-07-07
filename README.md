@@ -1,98 +1,78 @@
-# ticktock — Timesheet management (Tentwenty front-end assessment)
+# ticktock — Timesheet management
 
-A Next.js app with **dummy credential login**, **session-based auth (next-auth)**, and **in-memory mock APIs** for weekly timesheets and per-week task entries. The UI follows the provided dashboard flows: list view with filters + pagination, week detail with grouped tasks, and **add / edit / delete** tasks via modals.
+A Next.js timesheet app: weekly timesheet list with filters + pagination, week detail with grouped daily tasks, and add / edit / delete entries via modals. Auth and data are backed by an in-memory mock store.
 
 ## Tech stack
 
-- **Next.js 16** (App Router) + **TypeScript**
-- **Tailwind CSS v4** + **shadcn/ui**
-- **next-auth** (JWT session, Credentials provider)
-- **TanStack Query** + **TanStack Table**
-- **React Hook Form** + **Zod**
-- **Vitest** + **Testing Library** (unit / component smoke tests)
+- Next.js 16 (App Router) + TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- next-auth (JWT session, Credentials provider)
+- TanStack Query + TanStack Table
+- React Hook Form + Zod
+- Vitest + Testing Library
 
 ## Getting started
 
-### Prerequisites
-
-- Node.js 20+ recommended
-- npm (ships with Node)
-
-### Install & run
-
 ```bash
 npm install
-cp .env.example .env.local   # set NEXTAUTH_SECRET (see below)
+echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" > .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). You are redirected to `/login`.
+Open [http://localhost:3000](http://localhost:3000) — you're redirected to `/login`.
 
 ### Environment variables
 
-| Variable           | Purpose                                       |
-| ------------------ | --------------------------------------------- |
-| `NEXTAUTH_SECRET`  | Signing secret for JWT session cookies       |
-| `NEXTAUTH_URL`     | Canonical site URL (e.g. `http://localhost:3000`) |
+| Variable          | Purpose                                            |
+| ----------------- | --------------------------------------------------- |
+| `NEXTAUTH_SECRET` | Signing secret for JWT session cookies (required)    |
+| `NEXTAUTH_URL`    | Canonical site URL, e.g. `http://localhost:3000`     |
 
-Example `.env.example` is included; generate a strong secret for production.
+On Vercel, set `NEXTAUTH_SECRET` in Project Settings → Environment Variables for Production and Preview; `NEXTAUTH_URL` falls back to `https://$VERCEL_URL` if omitted.
 
-### Deploying (Vercel)
+### Demo login
 
-The `/login` page calls `getServerSession`. In **production**, NextAuth **throws** if `NEXTAUTH_SECRET` is missing, which surfaces as Vercel’s generic “This page couldn’t load” / server error.
-
-1. In the Vercel project → **Settings** → **Environment Variables**, add **`NEXTAUTH_SECRET`** for **Production** and **Preview** (use a long random string, e.g. `openssl rand -base64 32`).
-2. Optionally set **`NEXTAUTH_URL`** to your canonical URL (e.g. `https://your-app.vercel.app` or your custom domain). If you skip it, `next.config.ts` falls back to `https://$VERCEL_URL` on Vercel.
-3. Redeploy after saving variables.
-
-### Demo login (mock user)
-
-| Email                  | Password    |
-| ---------------------- | ----------- |
-| `mohsin@tentwenty.com` | `abc1234`   |
+| Email                  | Password  |
+| ---------------------- | --------- |
+| `mohsin@tentwenty.com` | `abc1234` |
 
 ## Scripts
 
-| Command          | Description                    |
-| ---------------- | ------------------------------ |
-| `npm run dev`    | Dev server                     |
-| `npm run build`  | Production build               |
-| `npm run start`  | Start production server        |
-| `npm run lint`   | ESLint                         |
-| `npm run test`   | Vitest (watch)                 |
-| `npm run test:run` | Vitest once (CI-friendly)    |
+| Command             | Description                |
+| -------------------- | --------------------------- |
+| `npm run dev`         | Dev server                  |
+| `npm run build`       | Production build            |
+| `npm run start`       | Start production server     |
+| `npm run lint`        | ESLint                       |
+| `npm run test`        | Vitest (watch)               |
+| `npm run test:run`    | Vitest once (CI-friendly)    |
 
-## Project structure (high level)
+## Project structure
 
-- `src/app/` — Routes (`/login`, `/dashboard`, `/dashboard/week/[weekId]`), layouts, providers
-- `src/app/api/` — **Internal API routes** only (timesheets + next-auth); the browser never imports mock data directly
-- `src/components/` — UI (header, tables, dialogs, shared shell/footer)
-- `src/features/timesheets/` — Query keys, hooks, client fetch/mutations
-- `src/lib/timesheets/` — Pure helpers (status rules, date copy, Zod schemas)
-- `src/server/mock/` — Seed users/weeks/entries + in-memory store (dev/demo)
-- `src/server/timesheets/` — Server-side query + mutation helpers used by route handlers
+```
+src/
+├─ app/                    # Routes, layouts, providers, API route handlers
+├─ components/             # Shared layout shell + shadcn/ui primitives
+├─ features/
+│  ├─ auth/                # Login form
+│  └─ timesheets/          # Components, API client, hooks, utils
+├─ lib/                    # Shared utils, Zod schemas, constants
+├─ server/                 # Auth config, mock store, server-side services
+├─ types/                  # Shared TypeScript types
+└─ middleware.ts           # Protects /dashboard routes
+```
 
-## Behaviour & assumptions
+## Behaviour
 
-1. **Authentication** — Credentials are checked against mock users in memory (not a real database). Sessions use **next-auth** JWT strategy.
-2. **Data** — Timesheet weeks and entries live in a **process-global in-memory store** so API routes behave like a backend during development. Refreshing the dev server resets data to seed values.
-3. **Weekly status badges** — Derived from total logged hours vs a **40h target**:  
-   `0h → Missing`, `>0 and <40 → Incomplete`, `≥40 → Completed`.
-4. **Mutations** — Creating/updating/deleting entries goes through `POST`/`PUT`/`DELETE` under `/api/timesheets/...`; forms reuse the same Zod schema as the API for consistent validation.
-5. **Deployment** — Set `NEXTAUTH_URL` and `NEXTAUTH_SECRET` in your host environment (e.g. Vercel). Use HTTPS in production.
+- **Auth** — Credentials checked against an in-memory mock user; sessions use next-auth JWT.
+- **Data** — Weeks/entries live in a process-global in-memory store; resets on server restart.
+- **Status badges** — `0h → Missing`, `<40h → Incomplete`, `≥40h → Completed`.
+- **Mutations** — Create/update/delete go through `/api/timesheets/...`; forms reuse the API's Zod schema.
 
 ## Testing
-
-Tests live next to source (`*.test.ts`, `*.test.tsx`). They cover core domain helpers and a small UI smoke test for the status badge.
 
 ```bash
 npm run test:run
 ```
 
-## Time spent
-
-_Approximate hours spent on this assessment: **\_\_\_** (fill before submitting)._
-
----
-
-Good luck with the review.
+Covers core domain helpers (`timesheetUtils`) and a status badge smoke test.

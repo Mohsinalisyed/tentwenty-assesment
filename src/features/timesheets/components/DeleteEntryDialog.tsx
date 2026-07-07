@@ -1,5 +1,7 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+
 import { useDeleteTimesheetEntry } from "@/features/timesheets/hooks/useTimesheetEntryMutations";
 import type { TimesheetEntryDto } from "@/types/timesheet.types";
 
@@ -76,6 +78,9 @@ export function DeleteEntryDialog({
             disabled={busy || !entry}
             onClick={() => void confirmDelete()}
           >
+            {busy ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : null}
             {busy ? "Deleting…" : "Delete"}
           </Button>
         </DialogFooter>

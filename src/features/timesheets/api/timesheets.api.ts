@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 import type { TimesheetUiStatus } from "@/lib/timesheets/timesheetUtils";
 import type {
@@ -44,6 +44,7 @@ export function getTimesheetListQuery(input: TimesheetListQueryInput) {
   return queryOptions({
     queryKey: timesheetsListQueryKey(input),
     queryFn: () => fetchTimesheetList(input),
+    placeholderData: keepPreviousData,
   });
 }
 

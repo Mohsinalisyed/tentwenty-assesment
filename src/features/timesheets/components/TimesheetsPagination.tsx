@@ -39,8 +39,9 @@ export function TimesheetsPagination({
           onValueChange={(v) => onPageSizeChange(Number(v))}
         >
           <SelectTrigger className="h-9 w-[120px] border-neutral-200 bg-white">
-            <SelectValue />
-            <span className="sr-only">per page</span>
+            <SelectValue>
+              {(value: string | null) => (value ? `${value} per page` : null)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {[5, 10, 20].map((n) => (
@@ -52,60 +53,62 @@ export function TimesheetsPagination({
         </Select>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-1.5">
-        <button
-          type="button"
-          aria-label="Previous page"
-          disabled={current <= 1}
-          onClick={() => onPageChange(current - 1)}
-          className={cn(
-            "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 shadow-sm transition-colors",
-            "hover:bg-neutral-50 disabled:pointer-events-none disabled:opacity-40",
-          )}
-        >
-          <ChevronLeft className="size-4" />
-          Previous
-        </button>
+      {total > 0 ? (
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
+          <button
+            type="button"
+            aria-label="Previous page"
+            disabled={current <= 1}
+            onClick={() => onPageChange(current - 1)}
+            className={cn(
+              "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 shadow-sm transition-colors",
+              "hover:bg-neutral-50 disabled:pointer-events-none disabled:opacity-40",
+            )}
+          >
+            <ChevronLeft className="size-4" />
+            Previous
+          </button>
 
-        {items.map((item, idx) =>
-          item === "ellipsis" ? (
-            <span
-              key={`e-${idx}`}
-              className="inline-flex min-w-9 items-center justify-center px-1 text-sm text-neutral-500"
-            >
-              …
-            </span>
-          ) : (
-            <button
-              key={item}
-              type="button"
-              onClick={() => onPageChange(item)}
-              className={cn(
-                "inline-flex size-9 items-center justify-center rounded-md border text-sm font-medium transition-colors",
-                item === current
-                  ? "border-brand-700 bg-brand-700 text-white shadow-sm"
-                  : "border-transparent bg-white text-neutral-700 hover:border-neutral-200 hover:bg-neutral-50",
-              )}
-            >
-              {item}
-            </button>
-          ),
-        )}
-
-        <button
-          type="button"
-          aria-label="Next page"
-          disabled={current >= totalPages}
-          onClick={() => onPageChange(current + 1)}
-          className={cn(
-            "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 shadow-sm transition-colors",
-            "hover:bg-neutral-50 disabled:pointer-events-none disabled:opacity-40",
+          {items.map((item, idx) =>
+            item === "ellipsis" ? (
+              <span
+                key={`e-${idx}`}
+                className="inline-flex min-w-9 items-center justify-center px-1 text-sm text-neutral-500"
+              >
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onPageChange(item)}
+                className={cn(
+                  "inline-flex size-9 items-center justify-center rounded-md border text-sm font-medium transition-colors",
+                  item === current
+                    ? "border-brand-700 bg-brand-700 text-white shadow-sm"
+                    : "border-transparent bg-white text-neutral-700 hover:border-neutral-200 hover:bg-neutral-50",
+                )}
+              >
+                {item}
+              </button>
+            ),
           )}
-        >
-          Next
-          <ChevronRight className="size-4" />
-        </button>
-      </div>
+
+          <button
+            type="button"
+            aria-label="Next page"
+            disabled={current >= totalPages}
+            onClick={() => onPageChange(current + 1)}
+            className={cn(
+              "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 shadow-sm transition-colors",
+              "hover:bg-neutral-50 disabled:pointer-events-none disabled:opacity-40",
+            )}
+          >
+            Next
+            <ChevronRight className="size-4" />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

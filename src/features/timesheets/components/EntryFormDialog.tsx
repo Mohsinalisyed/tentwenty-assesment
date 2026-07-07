@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { type ReactNode, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -338,6 +338,9 @@ export function EntryFormDialog({
               disabled={busy}
               className="h-11 w-full min-w-0 rounded-lg bg-timesheet-action text-sm font-medium text-white shadow-sm hover:bg-timesheet-action/90"
             >
+              {busy ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+              ) : null}
               {submitLabel}
             </Button>
             <Button

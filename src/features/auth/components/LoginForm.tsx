@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
@@ -145,9 +146,12 @@ export function LoginForm({ className }: { className?: string }) {
 
       <button
         type="submit"
-        className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-brand-700 text-base font-medium text-white shadow-none outline-none transition-colors hover:bg-brand-700/90 focus-visible:ring-4 focus-visible:ring-brand-600/35 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-700 text-base font-medium text-white shadow-none outline-none transition-colors hover:bg-brand-700/90 focus-visible:ring-4 focus-visible:ring-brand-600/35 disabled:pointer-events-none disabled:opacity-50"
         disabled={form.formState.isSubmitting}
       >
+        {form.formState.isSubmitting ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+        ) : null}
         {form.formState.isSubmitting ? "Signing in…" : "Sign in"}
       </button>
     </form>

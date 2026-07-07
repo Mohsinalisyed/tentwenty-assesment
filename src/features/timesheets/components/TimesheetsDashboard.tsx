@@ -6,6 +6,7 @@ import {
   type OnChangeFn,
   type SortingState,
 } from "@tanstack/react-table";
+import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
@@ -47,7 +48,7 @@ export function TimesheetsDashboard() {
     [page, pageSize, status, dateBounds, sortBy, sortDir],
   );
 
-  const { data, isLoading, isError, error } = useQuery(
+  const { data, isLoading, isFetching, isError, error } = useQuery(
     getTimesheetListQuery(queryInput),
   );
 
@@ -69,8 +70,14 @@ export function TimesheetsDashboard() {
       <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+            <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-neutral-900">
               Your Timesheets
+              {isFetching ? (
+                <Loader2
+                  className="size-4 animate-spin text-neutral-400"
+                  aria-label="Loading"
+                />
+              ) : null}
             </h1>
             <p className="mt-1 text-sm text-neutral-500">
               Review weekly submissions and open a week to edit tasks.
@@ -101,9 +108,10 @@ export function TimesheetsDashboard() {
             sorting={sorting}
             onSortingChange={handleSortingChange}
             isLoading={isLoading}
+            isFetching={isFetching}
           />
 
-          {data && data.total > 0 ? (
+          {data ? (
             <TimesheetsPagination
               page={data.page}
               pageSize={data.pageSize}

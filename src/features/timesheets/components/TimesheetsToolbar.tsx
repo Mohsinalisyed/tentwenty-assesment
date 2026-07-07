@@ -39,11 +39,19 @@ export function TimesheetsToolbar({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       <Select
-        value={datePreset}
-        onValueChange={(v) => onDatePresetChange(v as DateRangePresetValue)}
+        value={datePreset === "all" ? null : datePreset}
+        onValueChange={(v) =>
+          onDatePresetChange((v ?? "all") as DateRangePresetValue)
+        }
       >
         <SelectTrigger className="h-9 w-full min-w-[180px] border-neutral-200 bg-white sm:w-[180px]">
-          <SelectValue placeholder="Date Range" />
+          <SelectValue placeholder="Date Range">
+            {(value: DateRangePresetValue | null) =>
+              value
+                ? DATE_RANGE_PRESETS.find((p) => p.value === value)?.label
+                : "Date Range"
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {DATE_RANGE_PRESETS.map((p) => (
@@ -55,11 +63,19 @@ export function TimesheetsToolbar({
       </Select>
 
       <Select
-        value={status}
-        onValueChange={(v) => onStatusChange(v as TimesheetUiStatus | "all")}
+        value={status === "all" ? null : status}
+        onValueChange={(v) =>
+          onStatusChange((v ?? "all") as TimesheetUiStatus | "all")
+        }
       >
         <SelectTrigger className="h-9 w-full min-w-[160px] border-neutral-200 bg-white sm:w-[160px]">
-          <SelectValue placeholder="Status" />
+          <SelectValue placeholder="Status">
+            {(value: TimesheetUiStatus | null) =>
+              value
+                ? STATUS_OPTIONS.find((s) => s.value === value)?.label
+                : "Status"
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {STATUS_OPTIONS.map((s) => (

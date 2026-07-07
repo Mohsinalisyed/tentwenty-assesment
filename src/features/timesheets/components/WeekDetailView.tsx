@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { DeleteEntryDialog } from "@/features/timesheets/components/DeleteEntryDialog";
@@ -19,7 +19,7 @@ type WeekDetailViewProps = {
 };
 
 export function WeekDetailView({ weekId }: WeekDetailViewProps) {
-  const { data, isLoading, isError, error } = useQuery(
+  const { data, isLoading, isFetching, isError, error } = useQuery(
     getWeekDetailQuery(weekId),
   );
 
@@ -58,7 +58,10 @@ export function WeekDetailView({ weekId }: WeekDetailViewProps) {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-12 text-center text-sm text-neutral-500 sm:px-6 lg:px-8">
-        Loading week…
+        <span className="inline-flex items-center gap-2">
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+          Loading week…
+        </span>
       </div>
     );
   }
@@ -96,8 +99,14 @@ export function WeekDetailView({ weekId }: WeekDetailViewProps) {
       <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+            <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-neutral-900">
               This week&apos;s timesheet
+              {isFetching ? (
+                <Loader2
+                  className="size-4 animate-spin text-neutral-400"
+                  aria-label="Loading"
+                />
+              ) : null}
             </h1>
             <p className="text-base text-timesheet-cell-text">
               {week.dateRangeLabel}

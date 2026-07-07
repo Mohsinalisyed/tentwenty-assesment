@@ -85,12 +85,6 @@ export function AppHeader() {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <span
-          className="size-2 shrink-0 rounded-full bg-green-500"
-          title="Online"
-          aria-hidden
-        />
       </div>
     </header>
   );
